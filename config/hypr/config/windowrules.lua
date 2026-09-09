@@ -27,20 +27,4 @@ hl.window_rule({
     float = true,
 })
 
--- Привязываем скринсейвер-окно ко второму монитору (если он есть).
--- Если на машине только один монитор (eDP-1) — просто закомментируй эти две штуки.
-hl.window_rule({
-    name = "music-screensaver",
-    match = {
-        class = "^music-screensaver$"
-    },
-    monitor = "eDP-1",
-    fullscreen = true,
-})
 
--- ВАЖНО: этот скрипт (~/.config/start_screensaver.sh) — личный, не входит
--- в этот репозиторий. Скопируй его сюда сам, иначе автозапуск ниже просто
--- ничего не найдёт и молча ничего не сделает.
-hl.on("hyprland.start", function()
-    hl.exec_cmd("ghostty --class=music-screensaver -e " .. os.getenv("HOME") .. "/.config/start_screensaver.sh")
-end)

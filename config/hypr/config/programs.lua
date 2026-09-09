@@ -5,4 +5,5 @@ return {
     fileManager = "ghostty -e yazi",
     browser     = "zen-browser",
     menu        = "hyprlauncher",
+    uieditor    = "zeditor",
 }

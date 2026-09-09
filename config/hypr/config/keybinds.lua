@@ -10,10 +10,11 @@ hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(programs.menu))
+hl.bind(mainMod .. " + H", hl.dsp.exec_cmd(programs.uieditor))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 
--- Скриншот выделенной области в буфер обмена
+-- Скриншот выделенной облости в буфер обмена
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd([[grim -g "$(slurp)" - | wl-copy]]))
 
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -21,11 +22,31 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
-for i = 1, 10 do
-    local key = i % 10
-    hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+-- Разворачивание окна в пределах рабочей области (Maximize) и возврат обратно
+hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))
+
+-- Изменение размера активного окна через Super + Alt + HJKL
+hl.bind(mainMod .. " + ALT + H", hl.dsp.window.resize({ x = -10, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + ALT + L", hl.dsp.window.resize({ x = 10, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + ALT + K", hl.dsp.window.resize({ x = 0, y = -10, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + ALT + J", hl.dsp.window.resize({ x = 0, y = 10, relative = true }), { repeating = true })
+
+
+for i = 1, 9 do
+    hl.bind(mainMod .. " + " .. i, function()
+        hl.dispatch(hl.dsp.focus({ workspace = tostring(i), on_current_monitor = true }))
+    end)
 end
+
+-- Перемещение активного окна на воркспейс текущего монитора
+for i = 1, 9 do
+    hl.bind(mainMod .. " + SHIFT + " .. i, function()
+        hl.dispatch(hl.dsp.window.move({ workspace = tostring(i), follow = true })) -- или без follow = true, если не нужно переключаться вслед за окном
+    end)
+end
+
+-- hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
+-- hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
@@ -44,7 +65,7 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"
 -- Функции k4 (руками, без сгенерированного файла)
 -- ВАЖНО: SUPER+C НЕ включён сюда — оставлен за close window выше.
 ------------------------------------------------------------
-local raiz    = os.getenv("HOME") .. "/.config/quickshell/k4"
+local raiz    = "/home/fr1cks/.config/quickshell/k4"
 local k4      = "quickshell ipc -p " .. raiz .. "/shell.qml call k4 "
 local captura = "quickshell ipc -p " .. raiz .. "/shell.qml call k4.captura "
 local editor  = "quickshell ipc -p " .. raiz .. "/shell.qml call k4.editor "
@@ -59,7 +80,7 @@ hl.bind(mainMod .. " + N",           hl.dsp.exec_cmd(k4 .. "toggleNotifications"
 hl.bind(mainMod .. " + Z",           hl.dsp.exec_cmd(k4 .. "settings"))
 hl.bind(mainMod .. " + Tab",         hl.dsp.global("k4:atalaya"))
 hl.bind(mainMod .. " + SHIFT + W",   hl.dsp.exec_cmd(k4 .. "theme"))
-hl.bind(mainMod .. " + V",           hl.dsp.exec_cmd(k4 .. "clipboard"))
+hl.bind(mainMod .. " + V",           hl.dsp.exec_cmd(k4 .. "clipboard")) -- твоё решение: буфер обмена, не float
 hl.bind(mainMod .. " + B",           hl.dsp.exec_cmd(k4 .. "files"))
 hl.bind(mainMod .. " + K",           hl.dsp.exec_cmd(k4 .. "keys"))
 hl.bind(mainMod .. " + L",           hl.dsp.exec_cmd(k4 .. "lock"))
@@ -74,7 +95,7 @@ hl.bind(mainMod .. " + SHIFT + G",   hl.dsp.exec_cmd(k4 .. "askScreen"))
 hl.bind(mainMod .. " + ALT + G",     hl.dsp.exec_cmd(k4 .. "askRegion"))
 hl.bind(mainMod .. " + CONTROL + G", hl.dsp.exec_cmd(k4 .. "askSelection"))
 
--- Медиа — отдано под OSD k4, playerctl-бинды не дублируем
+-- Медиа — твоё решение: отдано под OSD k4, playerctl-бинды не дублируем
 hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd(k4 .. "togglePlay"), { locked = true })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd(k4 .. "togglePlay"), { locked = true })
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd(k4 .. "nextTrack"),  { locked = true })
@@ -100,6 +121,6 @@ hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("waypaper"))
 hl.bind(mainMod .. " + SHIFT + A", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + SHIFT + D", hl.dsp.focus({ workspace = "e+1" }))
 
--- Перекинуть текущее окно на другой монитор
+-- Перекинуть текущее окно на другой монитор (SUPER+SHIFT+A/D — стол влево/вправо)
 hl.bind(mainMod .. " + A", hl.dsp.window.move({ monitor = "-1", follow = true }))
 hl.bind(mainMod .. " + D", hl.dsp.window.move({ monitor = "+1", follow = true }))
